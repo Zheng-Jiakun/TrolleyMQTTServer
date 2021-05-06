@@ -1,6 +1,7 @@
 import paho.mqtt.client as mqtt
 import pymysql as mysql
 import json
+from datetime import datetime
 
 MAC_ADDRESS_STRING = 'M'
 BEACON_STRING = 'B'
@@ -42,7 +43,7 @@ def mysql_write(mac, beacons):
 
 # The callback for when the client receives a CONNACK response from the server.
 def on_connect(client, userdata, flags, rc):
-    print("Connected with result code "+str(rc))
+    print("MQTT connected with result code "+str(rc)+"\n")
 
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
@@ -51,6 +52,8 @@ def on_connect(client, userdata, flags, rc):
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
     message = json.loads(msg.payload.decode("utf-8"))
+    now = datetime.now()
+    print(now)
     print('MQTT Received: \nmac_address = ' + message[MAC_ADDRESS_STRING] + '\nbeacon = ' + json.dumps(message[BEACON_STRING]))
     mysql_write(message[MAC_ADDRESS_STRING], json.dumps(message[BEACON_STRING]))
 
